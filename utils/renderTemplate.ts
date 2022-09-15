@@ -50,7 +50,6 @@ function renderTemplate(src, dest) {
     const newCfg = fs.readFileSync(src, 'utf8')
 
     DiffLines(existing, newCfg).forEach((part) => {
-      console.log(part)
       cfg += part.value
     })
 
