@@ -1,6 +1,6 @@
 {
   "name": "create-loi",
-  "version": "0.0.3-alpha.0",
+  "version": "0.0.3-alpha.1",
   "description": "An easy way to start a Vue project",
   "bin": {
     "create-loi": "outfile.cjs"
