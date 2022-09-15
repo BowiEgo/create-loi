@@ -4,7 +4,7 @@ import * as path from 'node:path'
 import deepMerge from './deepMerge'
 import sortDependencies from './sortDependencies'
 
-const Diff = require('diff').diffLines
+const DiffLines = require('diff').diffLines
 
 /**
  * Renders a template folder/file to the file system,
@@ -49,7 +49,8 @@ function renderTemplate(src, dest) {
     const existing = fs.readFileSync(dest, 'utf8')
     const newCfg = fs.readFileSync(src, 'utf8')
 
-    Diff(existing, newCfg).forEach((part) => {
+    DiffLines(existing, newCfg).forEach((part) => {
+      console.log(part)
       cfg += part.value
     })
 

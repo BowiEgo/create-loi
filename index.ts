@@ -61,6 +61,7 @@ async function init() {
   const cwd = process.cwd()
   // possible options:
   // --default
+  // --multi-page / --pages
   // --typescript / --ts
   // --jsx
   // --px-to-viewport / --px
@@ -70,6 +71,7 @@ async function init() {
   // --force (for force overwriting)
   const argv = minimist(process.argv.slice(2), {
     alias: {
+      'multi-page': ['pages'],
       'px-to-viewport': ['px'],
       typescript: ['ts'],
       'with-tests': ['tests'],
@@ -93,6 +95,7 @@ async function init() {
     projectName?: string
     shouldOverwrite?: boolean
     packageName?: string
+    isMultiPage?: boolean
     needsTypeScript?: boolean
     needsJsx?: boolean
     needsPxToViewport?: boolean
@@ -107,6 +110,7 @@ async function init() {
     // - Project name:
     //   - whether to overwrite the existing directory or not?
     //   - enter a valid package name for package.json
+    // - Is Multi Page Project?
     // - Project language: JavaScript / TypeScript
     // - Add JSX Support?
     // - Install Plugin PxToViewport for Postcss?
@@ -148,6 +152,14 @@ async function init() {
           message: 'Package name:',
           initial: () => toValidPackageName(targetDir),
           validate: (dir) => isValidPackageName(dir) || 'Invalid package.json name'
+        },
+        {
+          name: 'isMultiPage',
+          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
+          message: 'Is Multi Page Project?',
+          initial: false,
+          active: 'Yes',
+          inactive: 'No'
         },
         {
           name: 'needsTypeScript',
@@ -228,6 +240,7 @@ async function init() {
     projectName,
     packageName = projectName ?? defaultProjectName,
     shouldOverwrite = argv.force,
+    isMultiPage = argv.pages,
     needsJsx = argv.jsx,
     needsPxToViewport = argv.px,
     needsTypeScript = argv.typescript,
@@ -263,6 +276,9 @@ async function init() {
   render('base')
 
   // Add configs.
+  if (isMultiPage) {
+    render('config/multi-page')
+  }
   if (needsJsx) {
     render('config/jsx')
   }
@@ -289,9 +305,11 @@ async function init() {
 
   // Render code template.
   // prettier-ignore
-  const codeTemplate =
-    (needsTypeScript ? 'typescript-' : '') +
-    (needsRouter ? 'router' : 'default')
+  let codeTemplate = (isMultiPage ? 'multi-page' : 'defult')
+
+  needsTypeScript && codeTemplate + '-typescript'
+  needsRouter && codeTemplate + '-router'
+
   render(`code/${codeTemplate}`)
 
   // Render entry file (main.js/ts).
