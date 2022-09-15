@@ -5,6 +5,8 @@ import { defineConfig } from 'vite'
 import legacy from '@vitejs/plugin-legacy'
 import vue2 from '@vitejs/plugin-vue2'
 
+var __dirname
+
 // https://vitejs.dev/config/
 export default defineConfig({
   root: 'src/pages',

@@ -161,14 +161,14 @@ async function init() {
           active: 'Yes',
           inactive: 'No'
         },
-        {
-          name: 'needsTypeScript',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add TypeScript?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
+        // {
+        //   name: 'needsTypeScript',
+        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
+        //   message: 'Add TypeScript?',
+        //   initial: false,
+        //   active: 'Yes',
+        //   inactive: 'No'
+        // },
         {
           name: 'needsJsx',
           type: () => (isFeatureFlagsUsed ? null : 'toggle'),
@@ -185,22 +185,22 @@ async function init() {
           active: 'Yes',
           inactive: 'No'
         },
-        {
-          name: 'needsRouter',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add Vue Router for Single Page Application development?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
-        {
-          name: 'needsPinia',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add Pinia for state management?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
+        // {
+        //   name: 'needsRouter',
+        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
+        //   message: 'Add Vue Router for Single Page Application development?',
+        //   initial: false,
+        //   active: 'Yes',
+        //   inactive: 'No'
+        // },
+        // {
+        //   name: 'needsPinia',
+        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
+        //   message: 'Add Pinia for state management?',
+        //   initial: false,
+        //   active: 'Yes',
+        //   inactive: 'No'
+        // },
         {
           name: 'needsEslint',
           type: () => (isFeatureFlagsUsed ? null : 'toggle'),
@@ -313,7 +313,18 @@ async function init() {
   render(`code/${codeTemplate}`)
 
   // Render entry file (main.js/ts).
-  if (needsPinia && needsRouter) {
+
+  if (isMultiPage) {
+    if (needsPinia && needsRouter) {
+      render('entry/multi-page-router-and-pinia')
+    } else if (needsPinia) {
+      render('entry/multi-page-pinia')
+    } else if (needsRouter) {
+      render('entry/multi-page-router')
+    } else {
+      render('entry/multi-page')
+    }
+  } else if (needsPinia && needsRouter) {
     render('entry/router-and-pinia')
   } else if (needsPinia) {
     render('entry/pinia')
