@@ -17,10 +17,18 @@ addEslintDependency('eslint-plugin-vue')
 
 interface ESLintConfig extends Linter.Config {
   extends: string[]
+  'vue/no-unsupported-features': any[]
 }
 const config: ESLintConfig = {
   root: true,
-  extends: ['plugin:vue/essential']
+  extends: ['plugin:vue/essential'],
+  'vue/no-unsupported-features': [
+    'error',
+    {
+      version: '^2.7.0',
+      ignores: []
+    }
+  ]
 }
 
 function configureEslint({ language, styleGuide, needsPrettier }) {

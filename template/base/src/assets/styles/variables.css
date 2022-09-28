@@ -1,0 +1,147 @@
+/**
+  * Color Palette
+  * -------------------------------------------------------------------------*/
+:root {
+  --my-c-white: #ffffff;
+  --my-c-white-soft: #f9f9f9;
+  --my-c-white-mute: #f1f1f1;
+
+  --my-c-black: #1a1a1a;
+  --my-c-black-pure: #000000;
+  --my-c-black-soft: #242424;
+  --my-c-black-mute: #2f2f2f;
+
+  --my-c-indigo: #213547;
+  --my-c-indigo-soft: #476582;
+  --my-c-indigo-light: #aac8e4;
+
+  --my-c-gray: #8e8e8e;
+  --my-c-gray-light-1: #aeaeae;
+  --my-c-gray-light-2: #c7c7c7;
+  --my-c-gray-light-3: #d1d1d1;
+  --my-c-gray-light-4: #e5e5e5;
+  --my-c-gray-light-5: #f2f2f2;
+  --my-c-gray-dark-1: #636363;
+  --my-c-gray-dark-2: #484848;
+  --my-c-gray-dark-3: #3a3a3a;
+  --my-c-gray-dark-4: #282828;
+  --my-c-gray-dark-5: #202020;
+
+  --my-c-divider-light-1: rgba(60, 60, 60, 0.29);
+  --my-c-divider-light-2: rgba(60, 60, 60, 0.12);
+  --my-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  --my-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  --my-c-text-light-1: var(--my-c-indigo);
+  --my-c-text-light-2: rgba(60, 60, 60, 0.7);
+  --my-c-text-light-3: rgba(60, 60, 60, 0.33);
+  --my-c-text-light-4: rgba(60, 60, 60, 0.18);
+  --my-c-text-light-code: var(--my-c-indigo-soft);
+
+  --my-c-text-dark-1: rgba(255, 255, 255, 0.87);
+  --my-c-text-dark-2: rgba(235, 235, 235, 0.6);
+  --my-c-text-dark-3: rgba(235, 235, 235, 0.38);
+  --my-c-text-dark-4: rgba(235, 235, 235, 0.18);
+  --my-c-text-dark-code: var(--my-c-indigo-light);
+
+  --my-c-green: #42b883;
+  --my-c-green-light: #42d392;
+  --my-c-green-lighter: #35eb9a;
+  --my-c-green-dark: #33a06f;
+  --my-c-green-darker: #155f3e;
+
+  --my-c-blue: #1989fa;
+  --my-c-blue-light: #549ced;
+  --my-c-blue-lighter: #50a2ff;
+  --my-c-blue-dark: #3468a3;
+  --my-c-blue-darker: #255489;
+
+  --my-c-yellow: #ffc517;
+  --my-c-yellow-light: #ffe417;
+  --my-c-yellow-lighter: #ffff17;
+  --my-c-yellow-dark: #e0ad15;
+  --my-c-yellow-darker: #bc9112;
+
+  --my-c-orange: #ff976a;
+  --my-c-orange-light: #f3ac8e;
+  --my-c-orange-lighter: #f3b79e;
+  --my-c-orange-dark: #ed6a0c;
+  --my-c-orange-darker: #d15d0a;
+
+  --my-c-red: #ed3c50;
+  --my-c-red-light: #f43771;
+  --my-c-red-lighter: #fd1d7c;
+  --my-c-red-dark: #cd2d3f;
+  --my-c-red-darker: #ab2131;
+
+  --my-c-purple: #de41e0;
+  --my-c-purple-light: #e936eb;
+  --my-c-purple-lighter: #f616f8;
+  --my-c-purple-dark: #823c83;
+  --my-c-purple-darker: #602960;
+
+  /**
+   * Gradient Colors
+   * --------------------------------------*/
+  --my-c-gradient-red: linear-gradient(to right, #ff6034, #ee0a24);
+  --my-c-gradient-orange: linear-gradient(to right, #ffd01e, #ff8917);
+}
+
+/**
+  * Components
+  * -------------------------------------------------------------------------*/
+:root {
+  /**
+   * Padding
+   * --------------------------------------*/
+  --my-padding-base: 4px;
+  --my-padding-xs: calc(var(--my-padding-base) * 2);
+  --my-padding-sm: calc(var(--my-padding-base) * 3);
+  --my-padding-md: calc(var(--my-padding-base) * 4);
+  --my-padding-lg: calc(var(--my-padding-base) * 6);
+  --my-padding-xl: calc(var(--my-padding-base) * 8);
+
+  /**
+   * Font
+   * --------------------------------------*/
+  --my-font-size-xs: 10px;
+  --my-font-size-sm: 12px;
+  --my-font-size-md: 14px;
+  --my-font-size-lg: 16px;
+  --my-font-size-xl: 18px;
+  --my-font-size-xxl: 20px;
+  --my-font-weight-bold: 500;
+  --my-line-height-xs: 14px;
+  --my-line-height-sm: 18px;
+  --my-line-height-md: 20px;
+  --my-line-height-lg: 22px;
+  --my-font-family-base: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+  /**
+   * Animation
+   * --------------------------------------*/
+  --my-animation-duration-base: 0.3s;
+  --my-animation-duration-fast: 0.2s;
+  --my-animation-timing-function-enter: ease-out;
+  --my-animation-timing-function-leave: ease-in;
+
+  /**
+   * Border
+   * --------------------------------------*/
+  --my-border-color: var(--my-c-gray-light-4);
+  --my-border-width-base: 1px;
+  --my-border-radius-sm: 2px;
+  --my-border-radius-md: 4px;
+  --my-border-radius-lg: 8px;
+  --my-border-radius-max: 999px;
+
+  /**
+   * Shadows
+   * --------------------------------------*/
+  --my-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --my-shadow-2: 0 3px 12px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(0, 0, 0, 0.07);
+  --my-shadow-3: 0 12px 32px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.08);
+  --my-shadow-4: 0 14px 44px rgba(0, 0, 0, 0.12), 0 3px 9px rgba(0, 0, 0, 0.12);
+  --my-shadow-5: 0 18px 56px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.16);
+}

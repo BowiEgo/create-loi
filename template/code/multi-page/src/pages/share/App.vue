@@ -1,17 +1,11 @@
 <script setup>
-import HelloWorld from "@/components/HelloWorld.vue";
+import HelloWorld from '@/widgets/HelloWorld.vue'
 </script>
 
 <template>
   <div id="app">
     <header>
-      <img
-        alt="Vue logo"
-        class="logo"
-        src="@/assets/logo.svg"
-        width="125"
-        height="125"
-      />
+      <img alt="Vue logo" class="logo" src="@/assets/logo.png" width="125" height="125" />
 
       <div class="wrapper">
         <HelloWorld msg="Share Page" />
