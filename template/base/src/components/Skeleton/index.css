@@ -5,7 +5,14 @@
   --skeleton-title-width: 40%;
   --skeleton-avatar-size: 32px;
   --skeleton-avatar-background-color: var(--my-c-gray-light-4);
+  --skeleton-image-background-color: var(--my-c-gray-light-4);
   --skeleton-animation-duration: 1.2s;
+}
+
+html[data-theme='dark'] {
+  --skeleton-row-background-color: var(--my-c-gray-dark-1);
+  --skeleton-avatar-background-color: var(--my-c-gray-dark-1);
+  --skeleton-image-background-color: var(--my-c-gray-dark-1);
 }
 
 .my-skeleton {
@@ -33,6 +40,12 @@
 
 .my-skeleton__avatar + .my-skeleton__content {
   padding-top: var(--my-padding-xs);
+}
+
+.my-skeleton__image {
+  margin-left: var(--my-padding-sm);
+  background-color: var(--skeleton-image-background-color);
+  border-radius: var(--my-border-radius-sm);
 }
 
 .my-skeleton__row,

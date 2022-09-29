@@ -2,18 +2,13 @@
   --card-padding: 18px 15px;
   --card-margin: 0 0 20px 0;
   --card-background-color: var(--my-c-white);
-  --card-border-radius: var(--my-border-radius-md);
+  --card-border-radius: var(--my-border-radius-sm);
   --card-shadow: 0 0 23px 0 #e6e6e6;
 }
 
 html[data-theme='dark'] {
   --card-background-color: var(--my-c-black-mute);
   --card-shadow: 0 0 23px 0 #292929;
-}
-
-html[data-theme='sky'] {
-  --card-background-color: var(--my-c-white-soft);
-  --card-shadow: 0 0 23px 0 #4d8fda;
 }
 
 .my-card {

@@ -11,8 +11,6 @@ html {
 body {
   margin: 0;
   font-family: var(--my-font-family-base);
-  color: var(--my-c-text-1);
-  background-color: var(--my-c-bg);
   text-rendering: optimizeLegibility;
 }
 

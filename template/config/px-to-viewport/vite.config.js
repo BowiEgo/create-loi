@@ -19,6 +19,15 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  server: {
+    host: true,
+    proxy: {
+      '/mock': {
+        target: 'http://localhost:3004',
+        rewrite: (path) => path.replace(/^\/mock/, '')
+      }
+    }
+  },
   css: {
     postcss: {
       plugins: [

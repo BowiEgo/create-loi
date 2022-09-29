@@ -1,0 +1,99 @@
+:root {
+  --my-slider-active-background-color: var(--my-c-blue);
+  --my-slider-inactive-background-color: var(--my-c-gray-light-4);
+  --my-slider-disabled-opacity: 0.5;
+  --my-slider-bar-height: 2px;
+  --my-slider-button-width: 24px;
+  --my-slider-button-height: 24px;
+  --my-slider-button-border-radius: 50%;
+  --my-slider-button-background-color: var(--my-c-white);
+  --my-slider-button-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] {
+  --my-slider-inactive-background-color: var(--my-c-gray-dark-2);
+}
+
+.my-slider {
+  position: relative;
+  width: 100%;
+  height: var(--my-slider-bar-height);
+  background: var(--my-slider-inactive-background-color);
+  border-radius: var(--my-border-radius-max);
+  cursor: pointer;
+}
+/* use pseudo element to expand click area */
+.my-slider::before {
+  position: absolute;
+  top: calc(var(--my-padding-xs) * -1);
+  right: 0;
+  bottom: calc(var(--my-padding-xs) * -1);
+  left: 0;
+  content: '';
+}
+
+.my-slider__bar {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--my-slider-active-background-color);
+  border-radius: inherit;
+  transition: all var(--my-animation-duration-fast);
+}
+
+.my-slider__button {
+  width: var(--my-slider-button-width);
+  height: var(--my-slider-button-height);
+  background: var(--my-slider-button-background-color);
+  border-radius: var(--my-slider-button-border-radius);
+  box-shadow: var(--my-slider-button-box-shadow);
+}
+.my-slider__button-wrapper {
+  position: absolute;
+  cursor: grab;
+  top: 50%;
+}
+.my-slider__button-wrapper--right {
+  right: 0;
+  transform: translate3d(50%, -50%, 0);
+}
+
+.my-slider__button-wrapper--left {
+  left: 0;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.my-slider--disabled {
+  cursor: not-allowed;
+  opacity: var(--my-slider-disabled-opacity);
+}
+.my-slider--disabled .my-slider__button-wrapper {
+  cursor: not-allowed;
+}
+
+.my-slider--vertical {
+  display: inline-block;
+  width: var(--my-slider-bar-height);
+  height: 100%;
+}
+.my-slider--vertical .my-slider__button-wrapper--right {
+  top: auto;
+  right: 50%;
+  bottom: 0;
+  transform: translate3d(50%, 50%, 0);
+}
+
+.my-slider--vertical .my-slider__button-wrapper--left {
+  top: 0;
+  right: 50%;
+  left: auto;
+  transform: translate3d(50%, -50%, 0);
+}
+
+/* use pseudo element to expand click area */
+.my-slider--vertical::before {
+  top: 0;
+  right: calc(var(--my-padding-xs) * -1);
+  bottom: 0;
+  left: calc(var(--my-padding-xs) * -1);
+}

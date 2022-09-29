@@ -131,9 +131,11 @@
    * --------------------------------------*/
   --my-border-color: var(--my-c-gray-light-4);
   --my-border-width-base: 1px;
-  --my-border-radius-sm: 2px;
-  --my-border-radius-md: 4px;
-  --my-border-radius-lg: 8px;
+  --my-border-radius-xs: 2px;
+  --my-border-radius-sm: 4px;
+  --my-border-radius-md: 8px;
+  --my-border-radius-lg: 16px;
+  --my-border-radius-xl: 32px;
   --my-border-radius-max: 999px;
 
   /**

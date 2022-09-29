@@ -15,7 +15,7 @@ html[data-theme='light'] {
 }
 
 html[data-theme='dark'] {
-  --app-background: var(--my-c-black);
+  --app-background: var(--my-c-black-soft);
   --app-background-soft: var(--my-c-black-soft);
   --app-background-mute: var(--my-c-black-mute);
 

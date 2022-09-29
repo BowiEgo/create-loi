@@ -7,6 +7,8 @@ const [name, bem] = createNamespace('skeleton', true)
 const DEFAULT_ROW_WIDTH = '100%'
 const DEFAULT_LAST_ROW_WIDTH = '60%'
 const DEFAULT_ROW_HEIGHT = '100%'
+const DEFAULT_IMAGE_WIDTH = '50%'
+const DEFAULT_IMAGE_HEIGHT = '70px'
 
 export default {
   name,
@@ -14,9 +16,18 @@ export default {
     title: Boolean,
     round: Boolean,
     avatar: Boolean,
+    image: Boolean,
     loading: { type: Boolean, default: true },
     animate: { type: Boolean, default: true },
     avatarSize: [Number, String],
+    imageWidth: {
+      type: [Number, String],
+      default: DEFAULT_IMAGE_WIDTH
+    },
+    imageHeight: {
+      type: [Number, String],
+      default: DEFAULT_IMAGE_HEIGHT
+    },
     titleWidth: [Number, String],
     titleHeight: [Number, String],
     titleMargin: [Number, String],
@@ -46,6 +57,9 @@ export default {
       avatar,
       avatarSize,
       avatarShape,
+      image,
+      imageWidth,
+      imageHeight,
       title,
       titleWidth,
       titleHeight,
@@ -61,6 +75,20 @@ export default {
     const renderAvatar = () => {
       if (avatar) {
         return <div class={bem('avatar', avatarShape)} style={getSizeStyle(avatarSize)} />
+      }
+    }
+
+    const renderImage = () => {
+      if (image) {
+        return (
+          <div
+            class={bem('image')}
+            style={{
+              width: addUnit(imageWidth),
+              height: addUnit(imageHeight)
+            }}
+          />
+        )
       }
     }
 
@@ -120,6 +148,7 @@ export default {
               {renderTitle()}
               {renderRows()}
             </div>
+            {renderImage()}
           </div>
         </Loading>
       )

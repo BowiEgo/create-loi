@@ -19,14 +19,32 @@ defineProps({
 </template>
 
 <style scoped>
+.greetings {
+  --h3-text-color: var(--my-c-text-light-1);
+  --greetings-hero-name-color: transparent;
+  --greetings-hero-name-background: -webkit-linear-gradient(120deg, #41d1ff 30%, #0f0fbc);
+}
+[data-theme='dark'] .greetings {
+  --h3-text-color: var(--my-c-text-dark-1);
+}
+.greetings {
+  margin-bottom: 20px;
+}
 h1 {
   font-weight: 500;
-  font-size: 40px;
-  top: -10px;
+  font-size: 30px;
+  line-height: 38px;
+  background: var(--greetings-hero-name-background);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: var(--greetings-hero-name-color);
+  /* top: -10px; */
 }
 
 h3 {
-  font-size: 24px;
+  font-size: 20px;
+  line-height: 28px;
+  color: var(--h3-text-color);
 }
 
 .greetings h1,
@@ -34,11 +52,9 @@ h3 {
   text-align: center;
 }
 
-@media (min-width: 1024px) {
-  .greetings h1,
-  .greetings h3 {
-    display: block;
-    text-align: left;
-  }
+a,
+.blue {
+  text-decoration: none;
+  color: #007acc;
 }
 </style>
