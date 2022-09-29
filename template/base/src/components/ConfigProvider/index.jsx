@@ -12,11 +12,22 @@ export default {
   name,
   inheritAttrs: false,
   props: {
-    textSizeConfig: {}
+    theme: {
+      type: String,
+      default: 'default'
+    },
+    textScale: {
+      type: Number,
+      default: 1
+    },
+    renderEmpty: {
+      type: Function,
+      default: defaultRenderEmpty
+    }
   },
   setup(props, { slots }) {
     const renderEmptyComponent = (name) => {
-      const renderEmpty = props.renderEmpty || slots.renderEmpty || defaultRenderEmpty
+      const renderEmpty = props.renderEmpty || slots.renderEmpty
       return renderEmpty(name)
     }
 

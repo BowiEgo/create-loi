@@ -1,4 +1,7 @@
 <script setup>
+import { computed } from 'vue'
+import { useTextScale } from '@/hooks'
+
 defineProps({
   title: {
     type: String,
@@ -13,10 +16,20 @@ defineProps({
     required: true
   }
 })
+
+// textScale
+const { fontSizeBase, em } = useTextScale()
+const cssVar = computed(() => {
+  return {
+    fontSize: fontSizeBase.value,
+    '--brief-text-size': em(16),
+    '--tail-text-size': em(12)
+  }
+})
 </script>
 
 <template>
-  <div class="news">
+  <div class="news" :style="cssVar">
     <div class="content">
       <div class="brief">
         <p class="my-multi-ellipsis--l2">
@@ -59,19 +72,19 @@ html[data-theme='dark'] .news {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-size: 16px;
   color: var(--news-brief-text-color);
-  line-height: 23px;
 }
 
 .brief p {
+  font-size: var(--brief-text-size);
+  line-height: calc(var(--brief-text-size) + 6px);
   margin: 0;
   margin-top: -2px;
 }
 
 .tail {
   margin-top: 12px;
-  font-size: 12px;
+  font-size: var(--tail-text-size);
   color: var(--news-tail-text-color);
   line-height: 12px;
 }

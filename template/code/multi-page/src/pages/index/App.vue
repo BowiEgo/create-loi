@@ -1,15 +1,29 @@
 <script setup>
+import { ref } from 'vue'
+import { useTheme } from '@/hooks'
+import { ConfigProvider } from '@/Components'
 import TopBar from '@/widgets/TopBar.vue'
 import HomeView from './views/HomeView.vue'
-import { useTheme } from '@/hooks'
 
-useTheme()
+const TEXT_SCALE_MAX = 3
+
+const { theme, setLightTheme, setDarkTheme } = useTheme()
+
+const textScale = ref(1)
+
+const updateTextScaleByPct = (percent) => {
+  textScale.value = 1 + ((TEXT_SCALE_MAX - 1) / 100) * percent
+}
 </script>
 
 <template>
   <div id="app">
-    <TopBar title="Loi Application" />
-    <HomeView />
+    <ConfigProvider :theme="theme.value" :text-scale="textScale">
+      <div>
+        <TopBar title="Loi Application" @changeSlider="updateTextScaleByPct" />
+        <HomeView />
+      </div>
+    </ConfigProvider>
   </div>
 </template>
 

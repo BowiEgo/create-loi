@@ -19,8 +19,10 @@ watch(isDarkTheme, () => {
   isDarkTheme.value ? setDarkTheme() : setLightTheme()
 })
 watch(textScalePercent, () => {
-  console.log(textScalePercent.value)
+  emit('changeSlider', textScalePercent.value)
 })
+
+const emit = defineEmits(['changeSlider'])
 </script>
 
 <template>

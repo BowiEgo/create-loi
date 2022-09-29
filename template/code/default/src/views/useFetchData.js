@@ -9,7 +9,7 @@ function useFetchHomeData(datas, loading) {
     console.info('列表', resp)
   }
 
-  Promise.all([fetchList(), sleep(0)]).then(() => {
+  Promise.all([fetchList(), sleep(1000)]).then(() => {
     console.log('首页数据加载完毕')
     loading.value = false
   })

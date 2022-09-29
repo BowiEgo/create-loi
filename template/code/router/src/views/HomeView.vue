@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import HelloWorld from '@/widgets/HelloWorld.vue'
 import News from '@/widgets/News.vue'
+import Paragraph from '@/widgets/Paragraph.vue'
 import { Card, Loading, Skeleton } from '@/components'
 import { useFetchHomeData } from './useFetchData'
 
@@ -47,13 +48,7 @@ useFetchHomeData({ list }, loading)
 
     <div v-if="!loading">
       <Card>
-        <p>
-          <span
-            >Lorem ipsum dolor sit amet consectetur, adipisicing elit. Excepturi voluptate id, rerum
-            quasi nam nisi obcaecati saepe facilis maxime inventore unde sit, aperiam pariatur eum
-            tenetur odit atque, aliquid rem.</span
-          >
-        </p>
+        <Paragraph />
       </Card>
     </div>
 

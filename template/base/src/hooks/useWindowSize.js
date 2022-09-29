@@ -5,6 +5,9 @@ let width
 let height
 
 export function useWindowSize() {
+  let width
+  let height
+
   if (!width) {
     width = ref(0)
     height = ref(0)

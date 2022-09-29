@@ -1,19 +1,33 @@
 <script setup>
-import TopBar from '@/widgets/TopBar.vue'
-import Home from './views/Home.vue'
+import { ref } from 'vue'
 import { useTheme } from '@/hooks'
+import { ConfigProvider } from '@/Components'
+import TopBar from '@/widgets/TopBar.vue'
+import HomeView from './views/HomeView.vue'
 
-useTheme()
+const TEXT_SCALE_MAX = 3
+
+const { theme, setLightTheme, setDarkTheme } = useTheme()
+
+const textScale = ref(1)
+
+const updateTextScaleByPct = (percent) => {
+  textScale.value = 1 + ((TEXT_SCALE_MAX - 1) / 100) * percent
+}
 </script>
 
 <template>
   <div id="app">
-    <TopBar title="Loi Application" />
-    <nav>
-      <router-link to="/">Home</router-link>
-      <router-link to="/about">About</router-link>
-    </nav>
-    <Home />
+    <ConfigProvider :theme="theme.value" :text-scale="textScale">
+      <div>
+        <TopBar title="Loi Application" @changeSlider="updateTextScaleByPct" />
+        <nav>
+          <router-link to="/">Home</router-link>
+          <router-link to="/about">About</router-link>
+        </nav>
+        <HomeView />
+      </div>
+    </ConfigProvider>
   </div>
 </template>
 
@@ -26,20 +40,28 @@ useTheme()
   font-weight: normal;
 }
 
-button {
-  width: 120px;
-  height: 30px;
-  background: transparent;
-  color: var(--app-background);
-  border-radius: var(--my-border-radius-max);
-  border: none;
+nav {
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 2rem;
 }
 
-button.light {
-  background: var(--my-c-white-soft);
+nav a.router-link-exact-active {
+  color: var(--color-text);
 }
 
-button.dark {
-  background: var(--my-c-black);
+nav a.router-link-exact-active:hover {
+  background-color: transparent;
+}
+
+nav a {
+  display: inline-block;
+  padding: 0 1rem;
+  border-left: 1px solid var(--color-border);
+}
+
+nav a:first-of-type {
+  border: 0;
 }
 </style>
