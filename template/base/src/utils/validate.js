@@ -19,7 +19,3 @@ export function isAndroid() {
 export function isIOS() {
   return inBrowser ? /ios|iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) : false
 }
-
-export function isJH() {
-  return inBrowser ? /gtja/.test(navigator.userAgent.toLowerCase()) : false
-}
