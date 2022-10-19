@@ -32,15 +32,15 @@ const config: ESLintConfig = {
 }
 
 function configureEslint({ language, styleGuide, needsPrettier }) {
+  config.extends.push('eslint:recommended')
   switch (`${styleGuide}-${language}`) {
     case 'default-javascript':
-      config.extends.push('eslint:recommended')
       break
-    case 'default-typescript':
-      addEslintDependency('@vue/eslint-config-typescript')
-      config.extends.push('eslint:recommended')
-      config.extends.push('@vue/eslint-config-typescript/recommended')
-      break
+    // case 'default-typescript':
+    //   addEslintDependency('@vue/eslint-config-typescript')
+    //   config.extends.push('eslint:recommended')
+    //   config.extends.push('@vue/eslint-config-typescript/recommended')
+    //   break
     // TODO: airbnb and standard
   }
 
@@ -64,9 +64,9 @@ function configureEslint({ language, styleGuide, needsPrettier }) {
   }
 }
 
-export default function renderEslint(rootDir, { needsTypeScript, needsPrettier }) {
+export default function renderEslint(rootDir, { needsPrettier }) {
   const { dependencies, configuration } = configureEslint({
-    language: needsTypeScript ? 'typescript' : 'javascript',
+    language: 'javascript',
     // we currently don't support other style guides
     styleGuide: 'default',
     needsPrettier
@@ -79,9 +79,7 @@ export default function renderEslint(rootDir, { needsTypeScript, needsPrettier }
     deepMerge(existingPkg, {
       scripts: {
         // Note that we reuse .gitignore here to avoid duplicating the configuration
-        lint: needsTypeScript
-          ? 'eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore'
-          : 'eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore'
+        lint: 'eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore'
       },
       devDependencies: dependencies
     })

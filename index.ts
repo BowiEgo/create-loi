@@ -9,6 +9,9 @@ import { red, green, bold } from 'kolorist'
 
 import renderTemplate from './utils/renderTemplate'
 import { postOrderDirectoryTraverse, preOrderDirectoryTraverse } from './utils/directoryTraverse'
+import generateAppVue from './utils/generateAppVue'
+import generateViteConfig from './utils/generateViteConfig'
+import generateEntry from './utils/generateEntry'
 import generateReadme from './utils/generateReadme'
 import getCommand from './utils/getCommand'
 import renderEslint from './utils/renderEslint'
@@ -62,8 +65,6 @@ async function init() {
   // possible options:
   // --default
   // --multi-page / --pages
-  // --typescript / --ts
-  // --jsx
   // --px-to-viewport / --px
   // --router / --vue-router
   // --eslint
@@ -73,7 +74,6 @@ async function init() {
     alias: {
       'multi-page': ['pages'],
       'px-to-viewport': ['px'],
-      typescript: ['ts'],
       'with-tests': ['tests'],
       router: ['vue-router']
     },
@@ -83,8 +83,7 @@ async function init() {
 
   // if any of the feature flags is set, we would skip the feature prompts
   const isFeatureFlagsUsed =
-    typeof (argv.default ?? argv.px ?? argv.ts ?? argv.jsx ?? argv.router ?? argv.eslint) ===
-    'boolean'
+    typeof (argv.default ?? argv.px ?? argv.router ?? argv.eslint) === 'boolean'
 
   let targetDir = argv._[0]
   const defaultProjectName = !targetDir ? 'vue-project' : targetDir
@@ -96,8 +95,6 @@ async function init() {
     shouldOverwrite?: boolean
     packageName?: string
     isMultiPage?: boolean
-    needsTypeScript?: boolean
-    needsJsx?: boolean
     needsPxToViewport?: boolean
     needsRouter?: boolean
     needsPinia?: boolean
@@ -111,8 +108,6 @@ async function init() {
     //   - whether to overwrite the existing directory or not?
     //   - enter a valid package name for package.json
     // - Is Multi Page Project?
-    // - Project language: JavaScript / TypeScript
-    // - Add JSX Support?
     // - Install Plugin PxToViewport for Postcss?
     // - Install Vue Router for SPA development?
     // - Install Pinia for state management?
@@ -161,22 +156,6 @@ async function init() {
           active: 'Yes',
           inactive: 'No'
         },
-        // {
-        //   name: 'needsTypeScript',
-        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-        //   message: 'Add TypeScript?',
-        //   initial: false,
-        //   active: 'Yes',
-        //   inactive: 'No'
-        // },
-        {
-          name: 'needsJsx',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add JSX Support?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
         {
           name: 'needsPxToViewport',
           type: () => (isFeatureFlagsUsed ? null : 'toggle'),
@@ -185,22 +164,22 @@ async function init() {
           active: 'Yes',
           inactive: 'No'
         },
-        // {
-        //   name: 'needsRouter',
-        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-        //   message: 'Add Vue Router for Single Page Application development?',
-        //   initial: false,
-        //   active: 'Yes',
-        //   inactive: 'No'
-        // },
-        // {
-        //   name: 'needsPinia',
-        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-        //   message: 'Add Pinia for state management?',
-        //   initial: false,
-        //   active: 'Yes',
-        //   inactive: 'No'
-        // },
+        {
+          name: 'needsRouter',
+          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
+          message: 'Add Vue Router for Single Page Application development?',
+          initial: false,
+          active: 'Yes',
+          inactive: 'No'
+        },
+        {
+          name: 'needsPinia',
+          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
+          message: 'Add Pinia for state management?',
+          initial: false,
+          active: 'Yes',
+          inactive: 'No'
+        },
         {
           name: 'needsEslint',
           type: () => (isFeatureFlagsUsed ? null : 'toggle'),
@@ -241,9 +220,7 @@ async function init() {
     packageName = projectName ?? defaultProjectName,
     shouldOverwrite = argv.force,
     isMultiPage = argv.pages,
-    needsJsx = argv.jsx,
     needsPxToViewport = argv.px,
-    needsTypeScript = argv.typescript,
     needsRouter = argv.router,
     needsPinia = argv.pinia,
     needsEslint = argv.eslint || argv['eslint-with-prettier'],
@@ -267,21 +244,20 @@ async function init() {
   // when bundling for node and the format is cjs
   // const templateRoot = new URL('./template', import.meta.url).pathname
   const templateRoot = path.resolve(__dirname, 'template')
-  const render = function render(templateName) {
+  const render = function render(templateName, dest = '') {
     const templateDir = path.resolve(templateRoot, templateName)
-    renderTemplate(templateDir, root)
+    dest = path.resolve(root, dest)
+    renderTemplate(templateDir, dest)
   }
 
   // Render base template
   render('base')
 
   // Add configs.
-  if (isMultiPage) {
-    render('config/multi-page')
-  }
-  if (needsJsx) {
-    render('config/jsx')
-  }
+  fs.writeFileSync(
+    path.resolve(root, 'vite.config.js'),
+    generateViteConfig({ isMultiPage, needsPxToViewport })
+  )
   if (needsPxToViewport) {
     render('config/px-to-viewport')
   }
@@ -291,98 +267,42 @@ async function init() {
   if (needsPinia) {
     render('config/pinia')
   }
-  if (needsTypeScript) {
-    render('config/typescript')
-
-    // Render tsconfigs
-    render('tsconfig/base')
-  }
-
-  // Render ESLint config
   if (needsEslint) {
-    renderEslint(root, { needsTypeScript, needsPrettier })
+    renderEslint(root, { needsPrettier })
   }
 
   // Render code template.
-  // prettier-ignore
-  let codeTemplate = (isMultiPage ? 'multi-page' : 'defult')
-
-  needsTypeScript && codeTemplate + '-typescript'
-  needsRouter && codeTemplate + '-router'
-
-  render(`code/${codeTemplate}`)
-
-  // Render entry file (main.js/ts).
-
   if (isMultiPage) {
-    if (needsPinia && needsRouter) {
-      render('entry/multi-page-router-and-pinia')
-    } else if (needsPinia) {
-      render('entry/multi-page-pinia')
-    } else if (needsRouter) {
-      render('entry/multi-page-router')
-    } else {
-      render('entry/multi-page')
-    }
-  } else if (needsPinia && needsRouter) {
-    render('entry/router-and-pinia')
-  } else if (needsPinia) {
-    render('entry/pinia')
-  } else if (needsRouter) {
-    render('entry/router')
+    render('code/multi-page')
+    render('code/views/src/views', 'src/pages/index/views')
+
+    fs.writeFileSync(path.resolve(root, 'src/pages/index/App.vue'), generateAppVue({ needsRouter }))
+
+    needsRouter && render('code/router/src', 'src/pages/index')
   } else {
-    render('entry/default')
+    render('code/default')
+    render('code/views')
+
+    fs.writeFileSync(path.resolve(root, 'src/App.vue'), generateAppVue({ needsRouter }))
+
+    needsRouter && render('code/router')
   }
 
-  // Cleanup.
-
-  // We try to share as many files between TypeScript and JavaScript as possible.
-  // If that's not possible, we put `.ts` version alongside the `.js` one in the templates.
-  // So after all the templates are rendered, we need to clean up the redundant files.
-  // (Currently it's only `cypress/plugin/index.ts`, but we might add more in the future.)
-  // (Or, we might completely get rid of the plugins folder as Cypress 10 supports `cypress.config.ts`)
-
-  if (needsTypeScript) {
-    // Convert the JavaScript template to the TypeScript
-    // Check all the remaining `.js` files:
-    //   - If the corresponding TypeScript version already exists, remove the `.js` version.
-    //   - Otherwise, rename the `.js` file to `.ts`
-    // Remove `jsconfig.json`, because we already have tsconfig.json
-    // `jsconfig.json` is not reused, because we use solution-style `tsconfig`s, which are much more complicated.
-    preOrderDirectoryTraverse(
-      root,
-      () => {},
-      (filepath) => {
-        if (filepath.endsWith('.js')) {
-          const tsFilePath = filepath.replace(/\.js$/, '.ts')
-          if (fs.existsSync(tsFilePath)) {
-            fs.unlinkSync(filepath)
-          } else {
-            fs.renameSync(filepath, tsFilePath)
-          }
-        } else if (path.basename(filepath) === 'jsconfig.json') {
-          fs.unlinkSync(filepath)
-        }
-      }
+  // Render entry file
+  if (isMultiPage) {
+    fs.writeFileSync(
+      path.resolve(root, 'src/pages/index/main.js'),
+      generateEntry({ needsPinia, needsRouter })
     )
-
-    // Rename entry in `index.html`
-    const indexHtmlPath = path.resolve(root, 'index.html')
-    const indexHtmlContent = fs.readFileSync(indexHtmlPath, 'utf8')
-    fs.writeFileSync(indexHtmlPath, indexHtmlContent.replace('src/main.js', 'src/main.ts'))
+    fs.writeFileSync(
+      path.resolve(root, 'src/pages/share/main.js'),
+      generateEntry({ needsPinia, needsRouter })
+    )
   } else {
-    // Remove all the remaining `.ts` files
-    preOrderDirectoryTraverse(
-      root,
-      () => {},
-      (filepath) => {
-        if (filepath.endsWith('.ts')) {
-          fs.unlinkSync(filepath)
-        }
-      }
-    )
+    fs.writeFileSync(path.resolve(root, 'src/main.js'), generateEntry({ needsPinia, needsRouter }))
   }
 
+  // prettier-ignore
   // Instructions:
   // Supported package managers: pnpm > yarn > npm
   // Note: until <https://github.com/pnpm/pnpm/issues/3505> is resolved,
@@ -396,7 +316,6 @@ async function init() {
     generateReadme({
       projectName: result.projectName ?? defaultProjectName,
       packageManager,
-      needsTypeScript,
       needsEslint
     })
   )
