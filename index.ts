@@ -294,10 +294,6 @@ async function init() {
       path.resolve(root, 'src/pages/index/main.js'),
       generateEntry({ needsPinia, needsRouter })
     )
-    fs.writeFileSync(
-      path.resolve(root, 'src/pages/share/main.js'),
-      generateEntry({ needsPinia, needsRouter })
-    )
   } else {
     fs.writeFileSync(path.resolve(root, 'src/main.js'), generateEntry({ needsPinia, needsRouter }))
   }

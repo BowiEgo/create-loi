@@ -4,8 +4,7 @@ import { ref } from 'vue'
 import { useTheme } from '@/hooks'
 import { ConfigProvider } from '@/Components'
 import TopBar from '@/widgets/TopBar.vue'
-import HomeView from './views/HomeView.vue'
-
+${needsRouter ? '' : `import HomeView from './views/HomeView.vue'\n`}
 const TEXT_SCALE_MAX = 3
 
 const { theme, setLightTheme, setDarkTheme } = useTheme()
@@ -27,10 +26,11 @@ const updateTextScaleByPct = (percent) => {
         <nav>
           <router-link to="/">Home</router-link>
           <router-link to="/about">About</router-link>
-        </nav>`
-            : ''
+        </nav>
+        <router-view></router-view>`
+            : `
+        <HomeView />`
         }
-        <HomeView />
       </div>
     </ConfigProvider>
   </div>
@@ -50,11 +50,11 @@ ${
   width: 100%;
   font-size: 12px;
   text-align: center;
-  margin-top: 2rem;
+  margin: 0.1rem 0 0.6rem 0;
 }
 
 nav a.router-link-exact-active {
-  color: var(--color-text);
+  color: var(--my-c-blue);
 }
 
 nav a.router-link-exact-active:hover {
@@ -65,6 +65,8 @@ nav a {
   display: inline-block;
   padding: 0 1rem;
   border-left: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: 700;
 }
 
 nav a:first-of-type {

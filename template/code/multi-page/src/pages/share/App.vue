@@ -29,11 +29,11 @@ nav {
   width: 100%;
   font-size: 12px;
   text-align: center;
-  margin-top: 2rem;
+  margin: 0.1rem 0 0.6rem 0;
 }
 
 nav a.router-link-exact-active {
-  color: var(--color-text);
+  color: var(--my-c-blue);
 }
 
 nav a.router-link-exact-active:hover {
@@ -44,6 +44,8 @@ nav a {
   display: inline-block;
   padding: 0 1rem;
   border-left: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: 700;
 }
 
 nav a:first-of-type {
