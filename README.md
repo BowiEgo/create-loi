@@ -6,4 +6,5 @@ An easy way to start a Vue project
 
 ```sh
 npm init loi
+npm init loi@alpha
 ```
