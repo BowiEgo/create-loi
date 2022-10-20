@@ -4,8 +4,8 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import minimist from 'minimist'
-import prompts from 'prompts'
-import { red, green, bold } from 'kolorist'
+import prompts, { prompt } from 'prompts'
+import { red, blue, magenta, bold } from 'kolorist'
 
 import renderTemplate from './utils/renderTemplate'
 import { postOrderDirectoryTraverse, preOrderDirectoryTraverse } from './utils/directoryTraverse'
@@ -83,7 +83,7 @@ async function init() {
 
   // if any of the feature flags is set, we would skip the feature prompts
   const isFeatureFlagsUsed =
-    typeof (argv.default ?? argv.px ?? argv.router ?? argv.eslint) === 'boolean'
+    typeof (argv.default ?? argv.page ?? argv.px ?? argv.router ?? argv.eslint) === 'boolean'
 
   let targetDir = argv._[0]
   const defaultProjectName = !targetDir ? 'vue-project' : targetDir
@@ -94,27 +94,29 @@ async function init() {
     projectName?: string
     shouldOverwrite?: boolean
     packageName?: string
+    needsPrettier?: boolean
     isMultiPage?: boolean
     needsPxToViewport?: boolean
     needsRouter?: boolean
     needsPinia?: boolean
     needsEslint?: boolean
-    needsPrettier?: boolean
   } = {}
 
-  try {
-    // Prompts:
-    // - Project name:
-    //   - whether to overwrite the existing directory or not?
-    //   - enter a valid package name for package.json
-    // - Is Multi Page Project?
-    // - Install Plugin PxToViewport for Postcss?
-    // - Install Vue Router for SPA development?
-    // - Install Pinia for state management?
-    // - Add ESLint for code quality?
-    // - Add Prettier for code formatting?
-    result = await prompts(
-      [
+  let isFirstPrompt = true
+
+  async function promptQuestions() {
+    let promptsResult,
+      // Prompts:
+      // - Project name:
+      //   - whether to overwrite the existing directory or not?
+      //   - enter a valid package name for package.json
+      // - A Multi Page Project?
+      // - Install Plugin PxToViewport for Postcss?
+      // - Install Vue Router for SPA development?
+      // - Install Pinia for state management?
+      // - Add ESLint for code quality?
+      // - Add Prettier for code formatting?
+      questions: any[] = [
         {
           name: 'projectName',
           type: targetDir ? null : 'text',
@@ -149,83 +151,163 @@ async function init() {
           validate: (dir) => isValidPackageName(dir) || 'Invalid package.json name'
         },
         {
-          name: 'isMultiPage',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Is Multi Page Project?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
-        {
-          name: 'needsPxToViewport',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add plugin px-to-viewport for Postcss?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
-        {
-          name: 'needsRouter',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add Vue Router for Single Page Application development?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
-        {
-          name: 'needsPinia',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add Pinia for state management?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
-        {
-          name: 'needsEslint',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add ESLint for code quality?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
+          name: 'optionalConfiguration',
+          type: () => {
+            if (isFeatureFlagsUsed) {
+              return null
+            }
+            return 'multiselect'
+          },
+          message: 'Select multi options for your project:',
+          choices: [
+            { title: `A ${magenta('Multi Page')} Project?`, value: 'isMultiPage' },
+            {
+              title: `Install Plugin ${magenta('PxToViewport')} for Postcss?`,
+              value: 'needsPxToViewport'
+            },
+            {
+              title: `Install Vue ${magenta('Router')} for SPA development?`,
+              value: 'needsRouter'
+            },
+            { title: `Install ${magenta('Pinia')} for state management?`, value: 'needsPinia' },
+            {
+              title: `Add ${magenta('ESLint')} for code quality?`,
+              value: 'needsEslint'
+            }
+          ],
+
+          format: (val) => {
+            return {
+              isMultiPage: val.includes('isMultiPage'),
+              needsPxToViewport: val.includes('needsPxToViewport'),
+              needsRouter: val.includes('needsRouter'),
+              needsPinia: val.includes('needsPinia'),
+              needsEslint: val.includes('needsEslint')
+            }
+          }
         },
         {
           name: 'needsPrettier',
           type: (prev, values) => {
-            if (isFeatureFlagsUsed || !values.needsEslint) {
+            if (isFeatureFlagsUsed || !values.optionalConfiguration.needsEslint) {
               return null
             }
             return 'toggle'
           },
-          message: 'Add Prettier for code formatting?',
+          message: `Add ${magenta('Prettier')} for code formatting?`,
           initial: false,
           active: 'Yes',
           inactive: 'No'
         }
-      ],
-      {
+      ]
+
+    try {
+      promptsResult = await prompts(isFirstPrompt ? questions : questions.slice(3), {
         onCancel: () => {
           throw new Error(red('✖') + ' Operation cancelled')
         }
-      }
+      })
+    } catch (cancelled) {
+      console.log(cancelled.message)
+      process.exit(1)
+    }
+
+    if (isFirstPrompt) {
+      result.projectName = promptsResult.projectName
+      result.packageName = promptsResult.projectName ?? defaultProjectName
+      result.shouldOverwrite = argv.force || promptsResult.shouldOverwrite
+    }
+
+    const { optionalConfiguration } = promptsResult
+
+    const {
+      isMultiPage = argv.pages,
+      needsPxToViewport = argv.px,
+      needsRouter = argv.router,
+      needsPinia = argv.pinia,
+      needsEslint = argv.eslint
+    } = optionalConfiguration
+    const needsPrettier = !!promptsResult.needsPrettier
+
+    let answerHints = []
+    Object.keys(optionalConfiguration).forEach((key) => {
+      answerHints.push(
+        `${
+          questions
+            .find((item) => item.name === 'optionalConfiguration')
+            .choices.find((item) => item.value === key).title
+        }  ${optionalConfiguration[key] ? bold(blue('✓')) : bold(red('✗'))}`
+      )
+    })
+    answerHints.push(
+      `${questions.find((item) => item.name === 'needsPrettier').message}  ${
+        needsPrettier ? bold(blue('✓')) : bold(red('✗'))
+      }`
     )
+
+    console.log(bold('\nThis is your configuration:\n'))
+    console.log('  Project name:', bold(blue(result.projectName)))
+    console.log('  Package name:', bold(blue(result.packageName)))
+    answerHints.forEach((hint) => console.log(`  ${hint}`))
+    console.log('\n')
+
+    isFirstPrompt = false
+
+    let isConfirm
+
+    try {
+      isConfirm = await prompts(
+        {
+          type: 'confirm',
+          name: 'value',
+          message: 'Is This OK?',
+          initial: true
+        },
+        {
+          onCancel: () => {
+            throw new Error(red('✖') + ' Operation cancelled')
+          }
+        }
+      )
+    } catch (cancelled) {
+      console.log(cancelled.message)
+      process.exit(1)
+    }
+
+    if (isConfirm.value) {
+      return {
+        isMultiPage,
+        needsPxToViewport,
+        needsRouter,
+        needsPinia,
+        needsEslint,
+        needsPrettier
+      }
+    } else {
+      return await promptQuestions()
+    }
+  }
+
+  try {
+    let promptResult = await promptQuestions()
+    result = { ...result, ...promptResult }
   } catch (cancelled) {
     console.log(cancelled.message)
     process.exit(1)
   }
 
-  // `initial` won't take effect if the prompt type is null
-  // so we still have to assign the default values here
+  // console.log('result', result)
   const {
-    projectName,
-    packageName = projectName ?? defaultProjectName,
-    shouldOverwrite = argv.force,
-    isMultiPage = argv.pages,
-    needsPxToViewport = argv.px,
-    needsRouter = argv.router,
-    needsPinia = argv.pinia,
-    needsEslint = argv.eslint || argv['eslint-with-prettier'],
-    needsPrettier = argv['eslint-with-prettier']
+    packageName,
+    shouldOverwrite,
+    isMultiPage,
+    needsPxToViewport,
+    needsRouter,
+    needsPinia,
+    needsEslint,
+    needsPrettier
   } = result
+
   const root = path.join(cwd, targetDir)
 
   if (fs.existsSync(root) && shouldOverwrite) {
@@ -318,13 +400,13 @@ async function init() {
 
   console.log(`\nDone. Now run:\n`)
   if (root !== cwd) {
-    console.log(`  ${bold(green(`cd ${path.relative(cwd, root)}`))}`)
+    console.log(`  ${bold(blue(`cd ${path.relative(cwd, root)}`))}`)
   }
-  console.log(`  ${bold(green(getCommand(packageManager, 'install')))}`)
+  console.log(`  ${bold(blue(getCommand(packageManager, 'install')))}`)
   if (needsPrettier) {
-    console.log(`  ${bold(green(getCommand(packageManager, 'lint')))}`)
+    console.log(`  ${bold(blue(getCommand(packageManager, 'lint')))}`)
   }
-  console.log(`  ${bold(green(getCommand(packageManager, 'dev')))}`)
+  console.log(`  ${bold(blue(getCommand(packageManager, 'dev')))}`)
   console.log()
 }
 
