@@ -1,0 +1,57 @@
+.my-multi-ellipsis--l1,
+.my-multi-ellipsis--l2,
+.my-multi-ellipsis--l3,
+.my-multi-ellipsis--l4,
+.my-multi-ellipsis--l5,
+.my-multi-ellipsis--l6,
+.my-multi-ellipsis--l7,
+.my-multi-ellipsis--l8,
+.my-multi-ellipsis--l9,
+.my-multi-ellipsis--l10 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
+}
+
+.my-multi-ellipsis--l1 {
+  -webkit-line-clamp: 1;
+}
+
+.my-multi-ellipsis--l2 {
+  -webkit-line-clamp: 2;
+}
+
+.my-multi-ellipsis--l3 {
+  -webkit-line-clamp: 3;
+}
+
+.my-multi-ellipsis--l4 {
+  -webkit-line-clamp: 4;
+}
+
+.my-multi-ellipsis--l5 {
+  -webkit-line-clamp: 4;
+}
+
+.my-multi-ellipsis--l6 {
+  -webkit-line-clamp: 4;
+}
+
+.my-multi-ellipsis--l7 {
+  -webkit-line-clamp: 4;
+}
+
+.my-multi-ellipsis--l8 {
+  -webkit-line-clamp: 4;
+}
+
+.my-multi-ellipsis--l9 {
+  -webkit-line-clamp: 4;
+}
+
+.my-multi-ellipsis--l10 {
+  -webkit-line-clamp: 4;
+}

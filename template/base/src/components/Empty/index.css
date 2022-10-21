@@ -1,0 +1,21 @@
+:root {
+  --empty-font-size: var(--my-font-size-sm);
+  --empty-color: var(--my-c-text-light-3);
+}
+
+.my-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.my-empty img {
+  width: 50%;
+}
+
+.my-empty span {
+  font-size: var(--empty-font-size);
+  color: var(--empty-color);
+}

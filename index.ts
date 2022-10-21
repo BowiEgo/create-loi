@@ -4,11 +4,14 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 import minimist from 'minimist'
-import prompts from 'prompts'
-import { red, green, bold } from 'kolorist'
+import prompts, { prompt } from 'prompts'
+import { red, blue, magenta, bold } from 'kolorist'
 
 import renderTemplate from './utils/renderTemplate'
 import { postOrderDirectoryTraverse, preOrderDirectoryTraverse } from './utils/directoryTraverse'
+import generateAppVue from './utils/generateAppVue'
+import generateViteConfig from './utils/generateViteConfig'
+import generateEntry from './utils/generateEntry'
 import generateReadme from './utils/generateReadme'
 import getCommand from './utils/getCommand'
 import renderEslint from './utils/renderEslint'
@@ -62,8 +65,6 @@ async function init() {
   // possible options:
   // --default
   // --multi-page / --pages
-  // --typescript / --ts
-  // --jsx
   // --px-to-viewport / --px
   // --router / --vue-router
   // --eslint
@@ -73,7 +74,6 @@ async function init() {
     alias: {
       'multi-page': ['pages'],
       'px-to-viewport': ['px'],
-      typescript: ['ts'],
       'with-tests': ['tests'],
       router: ['vue-router']
     },
@@ -83,8 +83,7 @@ async function init() {
 
   // if any of the feature flags is set, we would skip the feature prompts
   const isFeatureFlagsUsed =
-    typeof (argv.default ?? argv.px ?? argv.ts ?? argv.jsx ?? argv.router ?? argv.eslint) ===
-    'boolean'
+    typeof (argv.default ?? argv.page ?? argv.px ?? argv.router ?? argv.eslint) === 'boolean'
 
   let targetDir = argv._[0]
   const defaultProjectName = !targetDir ? 'vue-project' : targetDir
@@ -95,31 +94,29 @@ async function init() {
     projectName?: string
     shouldOverwrite?: boolean
     packageName?: string
+    needsPrettier?: boolean
     isMultiPage?: boolean
-    needsTypeScript?: boolean
-    needsJsx?: boolean
     needsPxToViewport?: boolean
     needsRouter?: boolean
     needsPinia?: boolean
     needsEslint?: boolean
-    needsPrettier?: boolean
   } = {}
 
-  try {
-    // Prompts:
-    // - Project name:
-    //   - whether to overwrite the existing directory or not?
-    //   - enter a valid package name for package.json
-    // - Is Multi Page Project?
-    // - Project language: JavaScript / TypeScript
-    // - Add JSX Support?
-    // - Install Plugin PxToViewport for Postcss?
-    // - Install Vue Router for SPA development?
-    // - Install Pinia for state management?
-    // - Add ESLint for code quality?
-    // - Add Prettier for code formatting?
-    result = await prompts(
-      [
+  let isFirstPrompt = true
+
+  async function promptQuestions() {
+    let promptsResult,
+      // Prompts:
+      // - Project name:
+      //   - whether to overwrite the existing directory or not?
+      //   - enter a valid package name for package.json
+      // - A Multi Page Project?
+      // - Install Plugin PxToViewport for Postcss?
+      // - Install Vue Router for SPA development?
+      // - Install Pinia for state management?
+      // - Add ESLint for code quality?
+      // - Add Prettier for code formatting?
+      questions: any[] = [
         {
           name: 'projectName',
           type: targetDir ? null : 'text',
@@ -154,101 +151,163 @@ async function init() {
           validate: (dir) => isValidPackageName(dir) || 'Invalid package.json name'
         },
         {
-          name: 'isMultiPage',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Is Multi Page Project?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
-        // {
-        //   name: 'needsTypeScript',
-        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-        //   message: 'Add TypeScript?',
-        //   initial: false,
-        //   active: 'Yes',
-        //   inactive: 'No'
-        // },
-        {
-          name: 'needsJsx',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add JSX Support?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
-        {
-          name: 'needsPxToViewport',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add plugin px-to-viewport for Postcss?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
-        },
-        // {
-        //   name: 'needsRouter',
-        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-        //   message: 'Add Vue Router for Single Page Application development?',
-        //   initial: false,
-        //   active: 'Yes',
-        //   inactive: 'No'
-        // },
-        // {
-        //   name: 'needsPinia',
-        //   type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-        //   message: 'Add Pinia for state management?',
-        //   initial: false,
-        //   active: 'Yes',
-        //   inactive: 'No'
-        // },
-        {
-          name: 'needsEslint',
-          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
-          message: 'Add ESLint for code quality?',
-          initial: false,
-          active: 'Yes',
-          inactive: 'No'
+          name: 'optionalConfiguration',
+          type: () => {
+            if (isFeatureFlagsUsed) {
+              return null
+            }
+            return 'multiselect'
+          },
+          message: 'Select multi options for your project:',
+          choices: [
+            { title: `A ${magenta('Multi Page')} Project?`, value: 'isMultiPage' },
+            {
+              title: `Install Plugin ${magenta('PxToViewport')} for Postcss?`,
+              value: 'needsPxToViewport'
+            },
+            {
+              title: `Install Vue ${magenta('Router')} for SPA development?`,
+              value: 'needsRouter'
+            },
+            { title: `Install ${magenta('Pinia')} for state management?`, value: 'needsPinia' },
+            {
+              title: `Add ${magenta('ESLint')} for code quality?`,
+              value: 'needsEslint'
+            }
+          ],
+
+          format: (val) => {
+            return {
+              isMultiPage: val.includes('isMultiPage'),
+              needsPxToViewport: val.includes('needsPxToViewport'),
+              needsRouter: val.includes('needsRouter'),
+              needsPinia: val.includes('needsPinia'),
+              needsEslint: val.includes('needsEslint')
+            }
+          }
         },
         {
           name: 'needsPrettier',
           type: (prev, values) => {
-            if (isFeatureFlagsUsed || !values.needsEslint) {
+            if (isFeatureFlagsUsed || !values.optionalConfiguration.needsEslint) {
               return null
             }
             return 'toggle'
           },
-          message: 'Add Prettier for code formatting?',
+          message: `Add ${magenta('Prettier')} for code formatting?`,
           initial: false,
           active: 'Yes',
           inactive: 'No'
         }
-      ],
-      {
+      ]
+
+    try {
+      promptsResult = await prompts(isFirstPrompt ? questions : questions.slice(3), {
         onCancel: () => {
           throw new Error(red('✖') + ' Operation cancelled')
         }
-      }
+      })
+    } catch (cancelled) {
+      console.log(cancelled.message)
+      process.exit(1)
+    }
+
+    if (isFirstPrompt) {
+      result.projectName = promptsResult.projectName
+      result.packageName = promptsResult.projectName ?? defaultProjectName
+      result.shouldOverwrite = argv.force || promptsResult.shouldOverwrite
+    }
+
+    const { optionalConfiguration } = promptsResult
+
+    const {
+      isMultiPage = argv.pages,
+      needsPxToViewport = argv.px,
+      needsRouter = argv.router,
+      needsPinia = argv.pinia,
+      needsEslint = argv.eslint
+    } = optionalConfiguration
+    const needsPrettier = !!promptsResult.needsPrettier
+
+    let answerHints = []
+    Object.keys(optionalConfiguration).forEach((key) => {
+      answerHints.push(
+        `${
+          questions
+            .find((item) => item.name === 'optionalConfiguration')
+            .choices.find((item) => item.value === key).title
+        }  ${optionalConfiguration[key] ? bold(blue('✓')) : bold(red('✗'))}`
+      )
+    })
+    answerHints.push(
+      `${questions.find((item) => item.name === 'needsPrettier').message}  ${
+        needsPrettier ? bold(blue('✓')) : bold(red('✗'))
+      }`
     )
+
+    console.log(bold('\nThis is your configuration:\n'))
+    console.log('  Project name:', bold(blue(result.projectName)))
+    console.log('  Package name:', bold(blue(result.packageName)))
+    answerHints.forEach((hint) => console.log(`  ${hint}`))
+    console.log('\n')
+
+    isFirstPrompt = false
+
+    let isConfirm
+
+    try {
+      isConfirm = await prompts(
+        {
+          type: 'confirm',
+          name: 'value',
+          message: 'Is This OK?',
+          initial: true
+        },
+        {
+          onCancel: () => {
+            throw new Error(red('✖') + ' Operation cancelled')
+          }
+        }
+      )
+    } catch (cancelled) {
+      console.log(cancelled.message)
+      process.exit(1)
+    }
+
+    if (isConfirm.value) {
+      return {
+        isMultiPage,
+        needsPxToViewport,
+        needsRouter,
+        needsPinia,
+        needsEslint,
+        needsPrettier
+      }
+    } else {
+      return await promptQuestions()
+    }
+  }
+
+  try {
+    let promptResult = await promptQuestions()
+    result = { ...result, ...promptResult }
   } catch (cancelled) {
     console.log(cancelled.message)
     process.exit(1)
   }
 
-  // `initial` won't take effect if the prompt type is null
-  // so we still have to assign the default values here
+  // console.log('result', result)
   const {
-    projectName,
-    packageName = projectName ?? defaultProjectName,
-    shouldOverwrite = argv.force,
-    isMultiPage = argv.pages,
-    needsJsx = argv.jsx,
-    needsPxToViewport = argv.px,
-    needsTypeScript = argv.typescript,
-    needsRouter = argv.router,
-    needsPinia = argv.pinia,
-    needsEslint = argv.eslint || argv['eslint-with-prettier'],
-    needsPrettier = argv['eslint-with-prettier']
+    packageName,
+    shouldOverwrite,
+    isMultiPage,
+    needsPxToViewport,
+    needsRouter,
+    needsPinia,
+    needsEslint,
+    needsPrettier
   } = result
+
   const root = path.join(cwd, targetDir)
 
   if (fs.existsSync(root) && shouldOverwrite) {
@@ -267,21 +326,20 @@ async function init() {
   // when bundling for node and the format is cjs
   // const templateRoot = new URL('./template', import.meta.url).pathname
   const templateRoot = path.resolve(__dirname, 'template')
-  const render = function render(templateName) {
+  const render = function render(templateName, dest = '') {
     const templateDir = path.resolve(templateRoot, templateName)
-    renderTemplate(templateDir, root)
+    dest = path.resolve(root, dest)
+    renderTemplate(templateDir, dest)
   }
 
   // Render base template
   render('base')
 
   // Add configs.
-  if (isMultiPage) {
-    render('config/multi-page')
-  }
-  if (needsJsx) {
-    render('config/jsx')
-  }
+  fs.writeFileSync(
+    path.resolve(root, 'vite.config.js'),
+    generateViteConfig({ isMultiPage, needsPxToViewport })
+  )
   if (needsPxToViewport) {
     render('config/px-to-viewport')
   }
@@ -291,98 +349,38 @@ async function init() {
   if (needsPinia) {
     render('config/pinia')
   }
-  if (needsTypeScript) {
-    render('config/typescript')
-
-    // Render tsconfigs
-    render('tsconfig/base')
-  }
-
-  // Render ESLint config
   if (needsEslint) {
-    renderEslint(root, { needsTypeScript, needsPrettier })
+    renderEslint(root, { needsPrettier })
   }
 
   // Render code template.
-  // prettier-ignore
-  let codeTemplate = (isMultiPage ? 'multi-page' : 'defult')
-
-  needsTypeScript && codeTemplate + '-typescript'
-  needsRouter && codeTemplate + '-router'
-
-  render(`code/${codeTemplate}`)
-
-  // Render entry file (main.js/ts).
-
   if (isMultiPage) {
-    if (needsPinia && needsRouter) {
-      render('entry/multi-page-router-and-pinia')
-    } else if (needsPinia) {
-      render('entry/multi-page-pinia')
-    } else if (needsRouter) {
-      render('entry/multi-page-router')
-    } else {
-      render('entry/multi-page')
-    }
-  } else if (needsPinia && needsRouter) {
-    render('entry/router-and-pinia')
-  } else if (needsPinia) {
-    render('entry/pinia')
-  } else if (needsRouter) {
-    render('entry/router')
+    render('code/multi-page')
+    render('code/views/src/views', 'src/pages/index/views')
+
+    fs.writeFileSync(path.resolve(root, 'src/pages/index/App.vue'), generateAppVue({ needsRouter }))
+
+    needsRouter && render('code/router/src', 'src/pages/index')
   } else {
-    render('entry/default')
+    render('code/default')
+    render('code/views')
+
+    fs.writeFileSync(path.resolve(root, 'src/App.vue'), generateAppVue({ needsRouter }))
+
+    needsRouter && render('code/router')
   }
 
-  // Cleanup.
-
-  // We try to share as many files between TypeScript and JavaScript as possible.
-  // If that's not possible, we put `.ts` version alongside the `.js` one in the templates.
-  // So after all the templates are rendered, we need to clean up the redundant files.
-  // (Currently it's only `cypress/plugin/index.ts`, but we might add more in the future.)
-  // (Or, we might completely get rid of the plugins folder as Cypress 10 supports `cypress.config.ts`)
-
-  if (needsTypeScript) {
-    // Convert the JavaScript template to the TypeScript
-    // Check all the remaining `.js` files:
-    //   - If the corresponding TypeScript version already exists, remove the `.js` version.
-    //   - Otherwise, rename the `.js` file to `.ts`
-    // Remove `jsconfig.json`, because we already have tsconfig.json
-    // `jsconfig.json` is not reused, because we use solution-style `tsconfig`s, which are much more complicated.
-    preOrderDirectoryTraverse(
-      root,
-      () => {},
-      (filepath) => {
-        if (filepath.endsWith('.js')) {
-          const tsFilePath = filepath.replace(/\.js$/, '.ts')
-          if (fs.existsSync(tsFilePath)) {
-            fs.unlinkSync(filepath)
-          } else {
-            fs.renameSync(filepath, tsFilePath)
-          }
-        } else if (path.basename(filepath) === 'jsconfig.json') {
-          fs.unlinkSync(filepath)
-        }
-      }
+  // Render entry file
+  if (isMultiPage) {
+    fs.writeFileSync(
+      path.resolve(root, 'src/pages/index/main.js'),
+      generateEntry({ needsPinia, needsRouter })
     )
-
-    // Rename entry in `index.html`
-    const indexHtmlPath = path.resolve(root, 'index.html')
-    const indexHtmlContent = fs.readFileSync(indexHtmlPath, 'utf8')
-    fs.writeFileSync(indexHtmlPath, indexHtmlContent.replace('src/main.js', 'src/main.ts'))
   } else {
-    // Remove all the remaining `.ts` files
-    preOrderDirectoryTraverse(
-      root,
-      () => {},
-      (filepath) => {
-        if (filepath.endsWith('.ts')) {
-          fs.unlinkSync(filepath)
-        }
-      }
-    )
+    fs.writeFileSync(path.resolve(root, 'src/main.js'), generateEntry({ needsPinia, needsRouter }))
   }
 
+  // prettier-ignore
   // Instructions:
   // Supported package managers: pnpm > yarn > npm
   // Note: until <https://github.com/pnpm/pnpm/issues/3505> is resolved,
@@ -396,20 +394,19 @@ async function init() {
     generateReadme({
       projectName: result.projectName ?? defaultProjectName,
       packageManager,
-      needsTypeScript,
       needsEslint
     })
   )
 
   console.log(`\nDone. Now run:\n`)
   if (root !== cwd) {
-    console.log(`  ${bold(green(`cd ${path.relative(cwd, root)}`))}`)
+    console.log(`  ${bold(blue(`cd ${path.relative(cwd, root)}`))}`)
   }
-  console.log(`  ${bold(green(getCommand(packageManager, 'install')))}`)
+  console.log(`  ${bold(blue(getCommand(packageManager, 'install')))}`)
   if (needsPrettier) {
-    console.log(`  ${bold(green(getCommand(packageManager, 'lint')))}`)
+    console.log(`  ${bold(blue(getCommand(packageManager, 'lint')))}`)
   }
-  console.log(`  ${bold(green(getCommand(packageManager, 'dev')))}`)
+  console.log(`  ${bold(blue(getCommand(packageManager, 'dev')))}`)
   console.log()
 }
 

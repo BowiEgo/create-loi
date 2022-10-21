@@ -1,0 +1,68 @@
+:root {
+  --my-switch-size: 30px;
+  --my-switch-width: 2em;
+  --my-switch-height: 1em;
+  --my-switch-node-size: 1em;
+  --my-switch-node-background-color: var(--my-c-white);
+  --my-switch-node-box-shadow: 0 3px 1px 0 rgba(0, 0, 0, 0.05), 0 2px 2px 0 rgba(0, 0, 0, 0.1),
+    0 3px 3px 0 rgba(0, 0, 0, 0.05);
+  --my-switch-background-color: #fafafa;
+  --my-switch-on-background-color: var(--my-c-blue);
+  --my-switch-transition-duration: 0.3s;
+  --my-switch-disabled-opacity: 0.5;
+  --my-switch-border: var(--my-border-width-base) solid rgba(0, 0, 0, 0.1);
+}
+
+.my-switch {
+  position: relative;
+  display: inline-block;
+  box-sizing: content-box;
+  width: var(--my-switch-width);
+  height: var(--my-switch-height);
+  font-size: var(--my-switch-size);
+  background: var(--my-switch-background-color);
+  border: var(--my-switch-border);
+  border-radius: var(--my-switch-node-size);
+  cursor: pointer;
+  transition: background-color var(--my-switch-transition-duration);
+}
+
+.my-switch__node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--my-switch-node-size);
+  height: var(--my-switch-node-size);
+  font-size: inherit;
+  background: var(--my-switch-node-background-color);
+  border-radius: 100%;
+  box-shadow: var(--my-switch-node-box-shadow);
+  transition: transform var(--my-switch-transition-duration) cubic-bezier(0.3, 1.05, 0.4, 1.05);
+}
+
+.my-switch__loading {
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  line-height: 1;
+}
+
+.my-switch--on {
+  background: var(--my-switch-on-background-color);
+}
+.my-switch--on .my-switch__node {
+  transform: translateX(calc(var(--my-switch-width) - var(--my-switch-node-size)));
+}
+.my-switch--on .my-switch__loading {
+  color: var(--my-switch-on-background-color);
+}
+
+.my-switch--disabled {
+  cursor: not-allowed;
+  opacity: var(--my-switch-disabled-opacity);
+}
+
+.my-switch--loading {
+  cursor: default;
+}

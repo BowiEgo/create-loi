@@ -1,0 +1,67 @@
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: var(--my-font-family-base);
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  text-decoration: none;
+}
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+input,
+button,
+textarea {
+  color: inherit;
+  font: inherit;
+}
+
+a,
+input,
+button,
+textarea,
+[class*='my-']:focus {
+  outline: none;
+}
+
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
