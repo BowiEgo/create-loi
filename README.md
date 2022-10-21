@@ -6,7 +6,6 @@
 
 ```sh
 npm init loi
-npm init loi@alpha
 ```
 
 ## 模板功能
@@ -19,7 +18,7 @@ npm init loi@alpha
 
    本模板的样式使用了原生 CSS 作为开发语言，以 CSS Variables 为原理，在根伪类:root 下定义了一系列全局/组件的样式变量，你可以根据需求进行相应调整。
 
-   以下是一些最常用的通用变量，所有样式变量可以在[这里](#/template/base/src/assets/styles/variables.css)找到。
+   以下是一些最常用的通用变量，所有样式变量可以在[这里](https://github.com/BowiEgo/create-loi/blob/main/template/base/src/assets/styles/variables.css)找到。
 
    ```
    // src/assets/styles/variables.css
@@ -51,7 +50,7 @@ npm init loi@alpha
 
 2. 主题文件
 
-   主题的设定以通过给 html 根标签设置一个 data-theme 属性，并声明不同 data-theme 下相关主题的 CSS 变量，然后通过 js 切换 data-theme 的属性值来达到切换主题的效果。主题文件可以在[这里](#/template/base/src/assets/styles/theme.css)找到。
+   主题的设定以通过给 html 根标签设置一个 data-theme 属性，并声明不同 data-theme 下相关主题的 CSS 变量，然后通过 js 切换 data-theme 的属性值来达到切换主题的效果。主题文件可以在[这里](https://github.com/BowiEgo/create-loi/blob/main/template/base/src/assets/styles/theme.css)找到。
 
    ```
     // src/assets/styles/theme.css
@@ -99,7 +98,7 @@ npm init loi@alpha
 
 4. 主题切换
 
-   通过[useTheme.js](#/template/base/src/hooks/useTheme.js) (**/src/assets/hooks/useTheme.js**)实现主题切换，使用方法如下：
+   通过[useTheme.js](https://github.com/BowiEgo/create-loi/blob/main/template/base/src/hooks/useTheme.js) (**/src/assets/hooks/useTheme.js**)实现主题切换，使用方法如下：
 
    ```
     import { useTheme } from '@/hooks'
@@ -132,7 +131,7 @@ npm init loi@alpha
 
 2. 使用方法
 
-   通过[useTextScale.js](#/template/base/src/hooks/useTextScale.js) (**/src/assets/hooks/useTextScale.js**)实现主题切换，使用方法如下：
+   通过[useTextScale.js](https://github.com/BowiEgo/create-loi/blob/main/template/base/src/hooks/useTextScale.js) (**/src/assets/hooks/useTextScale.js**)实现主题切换，使用方法如下：
 
    ```
     <script setup>
@@ -184,7 +183,7 @@ npm init loi@alpha
 
 ### 骨架屏
 
-> 本模板已包含骨架屏组件，使用方法请参考 [Skeleton 组件](#/template/base/src/components/Skeleton/README.zh-CN.md)。
+> 本模板已包含骨架屏组件，使用方法请参考 [Skeleton 组件](https://github.com/BowiEgo/create-loi/blob/main/template/base/src/components/Skeleton/README.zh-CN.md)。
 
 ### Mock
 
@@ -192,7 +191,7 @@ npm init loi@alpha
 
 1. Mock 原理
 
-   Mock 功能通过 [mockjs](http://mockjs.com/) 和 [json-server](https://github.com/typicode/json-server) 的组合来实现。要添加和修改相关接口及数据请到[db.js](#/template/base/src/mock/db.js)进行修改。
+   Mock 功能通过 [mockjs](http://mockjs.com/) 和 [json-server](https://github.com/typicode/json-server) 的组合来实现。要添加和修改相关接口及数据请到[db.js](https://github.com/BowiEgo/create-loi/blob/main/template/base/src/mock/db.js)进行修改。
 
 1. 使用方法
 
